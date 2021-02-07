@@ -37,8 +37,3 @@ func (l *log) S3() *glog.Logger {
 	l.Logger.SetPrefix("[s3]")
 	return l.Logger
 }
-
-func (l *log) ThemeZip() *glog.Logger {
-	l.Logger.SetPrefix("[theme_zip]")
-	return l.Logger
-}

@@ -10,9 +10,11 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gins"
 	"github.com/gogf/gf/os/gcache"
+	"github.com/gogf/gf/os/gtime"
 	"github.com/gogf/gf/os/gtimer"
 	"github.com/gogf/gf/util/gconv"
 	"github.com/gogf/gf/util/gutil"
+	"math"
 	"time"
 )
 
@@ -86,8 +88,9 @@ func (s *saws) assumeRole() (cre *Credentials, err error) {
 	c.SessionToken = result.Credentials.SessionToken
 	//过期时间转换成时间戳，和 php 版本的保持一直
 	c.Expiration = result.Credentials.Expiration.Unix()
-	//STS token 的有效期一个小时(3600秒)，我们缓存3500秒
-	gcache.Set("cache_key:aws:sts_token", c, 3500*time.Second)
+	//缓存三分之二的有效期
+	ex := gconv.Int64(math.Floor(gconv.Float64(c.Expiration-gtime.Timestamp()) * 0.66))
+	gcache.Set("cache_key:aws:sts_token", c, time.Duration(ex)*time.Second)
 	return &c, nil
 }
 
@@ -101,8 +104,9 @@ func (s *saws) GetSts() (Credentials, error) {
 	var c Credentials
 	if cache == nil {
 		c, _ := s.assumeRole()
-		//每隔3000秒，重新设置一次缓存
-		gtimer.AddSingleton(3000*time.Second, func() {
+		//有效期只有一半的时候，重新获取sts
+		ex := gconv.Int64(math.Floor(gconv.Float64(c.Expiration-gtime.Timestamp()) * 0.5))
+		gtimer.AddSingleton(time.Duration(ex)*time.Second, func() {
 			_, _ = s.assumeRole()
 		})
 		return *c, nil
