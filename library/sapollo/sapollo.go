@@ -10,10 +10,10 @@ import (
 )
 
 type Config struct {
-	appid      string
-	cluster    string
-	namespaces []string
-	addrs      map[string]string
+	Appid      string
+	Cluster    string
+	Namespaces []string
+	Addrs      map[string]string
 }
 
 //请求apollo获取配置文件
@@ -27,10 +27,10 @@ func Start(ac Config) {
 		return
 	}
 	err := agollo.Start(&agollo.Conf{
-		AppID:          ac.appid,
-		Cluster:        ac.cluster,
-		NameSpaceNames: ac.namespaces,
-		MetaAddr:       ac.addrs[env],
+		AppID:          ac.Appid,
+		Cluster:        ac.Cluster,
+		NameSpaceNames: ac.Namespaces,
+		MetaAddr:       ac.Addrs[env],
 	}, agollo.SkipLocalCache())
 	if err != nil {
 		panic(err)

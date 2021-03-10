@@ -22,10 +22,10 @@
 ```go
 //_ = genv.Set("ENV", "FAT")
 var ac = sapollo.Config{
-    appid:      "example-appid",
-    cluster:    "example-cluster",
-    namespaces: []string{"application"},
-    addrs: map[string]string{
+    Appid:      "example-appid",
+    Cluster:    "example-cluster",
+    Namespaces: []string{"application"},
+    Addrs: map[string]string{
         "dev": "http://dev-internal.apollo-config-center.com",
         "fat": "http://test-internal.apollo-config-center.com",
         "uat": "http://gray-internal.apollo-config-center.com",
