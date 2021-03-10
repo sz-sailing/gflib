@@ -19,7 +19,7 @@ type Config struct {
 //请求apollo获取配置文件
 func Start(ac Config) {
 	//如果没有配置环境变量，默认是本地环境，不走apollo
-	env := gstr.ToUpper(genv.Get("ENV"))
+	env := gstr.ToLower(genv.Get("ENV"))
 	if env == "" {
 		_ = g.Cfg().SetPath("etc")
 		g.Cfg().SetFileName("config-local.yaml")
