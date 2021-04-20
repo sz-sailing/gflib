@@ -73,16 +73,6 @@ func setConfig(key string, value string) {
 		}
 		return
 	}
-	// 数组的情况
-	if value != "," && gstr.Contains(value, ",") {
-		value = gstr.Trim(value, ",")
-		a := gstr.Split(value, ",")
-		err := g.Cfg().Set(key, a)
-		if err != nil {
-			g.Log().Error(err)
-		}
-		return
-	}
 	// 整型的情况
 	if i, err := strconv.Atoi(value); err == nil {
 		err := g.Cfg().Set(key, i)
