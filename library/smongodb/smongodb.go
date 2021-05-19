@@ -6,7 +6,6 @@ import (
 	"github.com/gogf/gf/container/gmap"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gins"
-	"github.com/gogf/gf/os/grpool"
 	"github.com/gogf/gf/util/gconv"
 	"github.com/gogf/gf/util/gutil"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -89,23 +88,21 @@ func (mcp *mongoConnectPool) getClient() (*mongo.Client, error) {
 // GetSession 从池子里拿 mongodb 的连接
 func (mcp *mongoConnectPool) GetSession() *mongo.Client {
 	var session *mongo.Client
-	session = mcp.sessions[mcp.nextSessionIndex]
+	thisSessionIndex := mcp.nextSessionIndex
+	session = mcp.sessions[thisSessionIndex]
+	mcp.nextSessionIndex = (mcp.nextSessionIndex + 1) % len(mcp.sessions)
 	//确定一下连接有没有中断
 	if err := session.Ping(context.TODO(), readpref.Primary()); err != nil {
 		//如果连接中断了，则断开重连一次
-		_ = grpool.Add(func() {
-			_ = session.Disconnect(context.TODO())
-			err = session.Connect(context.TODO())
-			if err != nil {
-				g.Log().Error(err)
-			} else {
-				mcp.sessions[mcp.nextSessionIndex] = session
-			}
-		})
-		mcp.nextSessionIndex = (mcp.nextSessionIndex + 1) % len(mcp.sessions)
+		_ = session.Disconnect(context.TODO())
+		err = session.Connect(context.TODO())
+		if err != nil {
+			g.Log().Error(err)
+		} else {
+			mcp.sessions[thisSessionIndex] = session
+		}
 		return mcp.GetSession()
 	}
-	mcp.nextSessionIndex = (mcp.nextSessionIndex + 1) % len(mcp.sessions)
 	return session
 }
 
