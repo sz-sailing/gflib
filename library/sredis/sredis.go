@@ -45,7 +45,7 @@ func ClusterClient(name ...string) *redis.ClusterClient {
 				panic(fmt.Sprintf(`configuration for redis not found for group "%s"`, key))
 			}
 		} else {
-			panic(fmt.Sprintf(`incomplete configuration for redis: "redis" node not found in config file "%s"`, config.FilePath()))
+			panic(fmt.Sprintf(`incomplete configuration for redis: "redis" node not found in config file "%s"`, config.GetFileName()))
 		}
 		return nil
 	}).(*redis.ClusterClient)
@@ -74,7 +74,7 @@ func Client(name ...string) *redis.Client {
 				panic(fmt.Sprintf(`configuration for redis not found for group "%s"`, key))
 			}
 		} else {
-			panic(fmt.Sprintf(`incomplete configuration for redis: "redis" node not found in config file "%s"`, config.FilePath()))
+			panic(fmt.Sprintf(`incomplete configuration for redis: "redis" node not found in config file "%s"`, config.GetFileName()))
 		}
 		return nil
 	}).(*redis.Client)

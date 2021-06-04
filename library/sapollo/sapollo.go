@@ -16,7 +16,7 @@ type Config struct {
 	Addrs      map[string]string
 }
 
-//请求apollo获取配置文件
+// Start 请求apollo获取配置文件
 func Start(ac Config) {
 	//如果没有配置环境变量，默认是本地环境，不走apollo
 	env := gstr.ToLower(genv.Get("ENV"))

@@ -8,10 +8,7 @@ import (
 
 var configPath string
 
-/**
-自动获取环境变量
-如果环境变量不存在，获取本地config-local.yaml
-*/
+// Setup 自动获取环境变量,如果环境变量不存在，获取本地config-local.yaml
 func Setup() {
 	env := gstr.ToUpper(genv.Get("ENV"))
 	configFile := getEnvConfig()

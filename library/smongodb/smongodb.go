@@ -31,7 +31,7 @@ const (
 	sMONGODB_NODE_NAME = "mongodb"
 )
 
-// Instance 返回一个 go-redis 的集群单例
+// Conn Instance 返回一个 go-redis 的集群单例
 func Conn(name ...string) *mongoConnectPool {
 	config := gins.Config()
 	key := sDEFAULT_NAME
@@ -56,7 +56,7 @@ func Conn(name ...string) *mongoConnectPool {
 				panic(fmt.Sprintf(`configuration for mongodb not found for group "%s"`, key))
 			}
 		} else {
-			panic(fmt.Sprintf(`incomplete configuration for mongodb: "mongodb" node not found in config file "%s"`, config.FilePath()))
+			panic(fmt.Sprintf(`incomplete configuration for mongodb: "mongodb" node not found in config file "%s"`, config.GetFileName()))
 		}
 		return nil
 	}).(*mongoConnectPool)

@@ -61,7 +61,7 @@ func Client(name ...string) *saws {
 				panic(fmt.Sprintf(`configuration for aws not found for group "%s"`, key))
 			}
 		} else {
-			panic(fmt.Sprintf(`incomplete configuration for aws: "aws" node not found in config file "%s"`, config.FilePath()))
+			panic(fmt.Sprintf(`incomplete configuration for aws: "aws" node not found in config file "%s"`, config.GetFileName()))
 		}
 		return nil
 	}).(*saws)
