@@ -48,7 +48,7 @@ func (l *log) Error(e error) {
 		RequestId:  gconv.String(l.Ctx.Value("request_id")),
 		Level:      l.GetLevelPrefix(glog.LEVEL_ERRO),
 		Domain:     gconv.String(l.Ctx.Value("domain")),
-		Trace:      l.GetStack(),
+		Trace:      l.GetStack(1),
 		ShopId:     gconv.Int64(l.Ctx.Value("shop_id")),
 		Referer:    gconv.String(l.Ctx.Value("referer")),
 		Message:    e.Error(),
