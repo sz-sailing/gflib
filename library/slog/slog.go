@@ -41,6 +41,17 @@ func SetCtxVar(r *ghttp.Request) {
 	r.SetCtxVar("request_id", r.GetHeader("request_id"))
 }
 
+// GetCtxVar 从请求中获取日志需要的上下文内容
+func GetCtxVar(r *ghttp.Request) context.Context {
+	Ctx := context.Background()
+	Ctx = context.WithValue(Ctx, "remote_addr", r.GetRemoteIp())
+	Ctx = context.WithValue(Ctx, "domain", r.GetHost())
+	Ctx = context.WithValue(Ctx, "referer", r.GetReferer())
+	Ctx = context.WithValue(Ctx, "shop_id", r.GetHeader("shop_id"))
+	Ctx = context.WithValue(Ctx, "request_id", r.GetHeader("request_id"))
+	return Ctx
+}
+
 func (l *log) Error(e error) {
 	var los = LogStd{
 		Prefix:     "[" + gconv.String(l.Ctx.Value("remote_addr")) + "][-][-]",
@@ -51,13 +62,13 @@ func (l *log) Error(e error) {
 		Trace:      l.GetStack(1),
 		ShopId:     gconv.Int64(l.Ctx.Value("shop_id")),
 		Referer:    gconv.String(l.Ctx.Value("referer")),
-		Message:    e.Error(),
 		RemoteAddr: gconv.String(l.Ctx.Value("remote_addr")),
 	}
-	//停止默认的堆栈打印
-	l.Logger.SetStack(false)
-	//停止默认的头信息打印
-	l.Logger.SetHeaderPrint(false)
+	if e == nil {
+		los.Message = nil
+	} else {
+		los.Message = e.Error()
+	}
 	l.Logger.Error(los)
 }
 
