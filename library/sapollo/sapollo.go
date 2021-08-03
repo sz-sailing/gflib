@@ -13,7 +13,7 @@ type Config struct {
 	Appid      string
 	Cluster    string
 	Namespaces []string
-	Addrs      map[string]string
+	Address    string
 }
 
 // Start 请求apollo获取配置文件
@@ -30,7 +30,7 @@ func Start(ac Config) {
 		AppID:          ac.Appid,
 		Cluster:        ac.Cluster,
 		NameSpaceNames: ac.Namespaces,
-		MetaAddr:       ac.Addrs[env],
+		MetaAddr:       ac.Address,
 	}, agollo.SkipLocalCache())
 	if err != nil {
 		panic(err)
