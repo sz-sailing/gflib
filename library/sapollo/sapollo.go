@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/text/gstr"
 	"github.com/philchia/agollo/v4"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -36,29 +37,40 @@ func Start(ac Config) {
 		panic(err)
 	}
 	agollo.OnUpdate(func(event *agollo.ChangeEvent) {
-		for key, value := range event.Changes {
-			setConfig(key, value.NewValue)
-		}
+		setConfig(ac.Namespaces)
 	})
-	//先将yaml的配置写文件，并且设置默认的配置文件目录和配置文件
-	setConfig("yaml", agollo.GetString("yaml"))
-	//获取其他的配置写入内存
-	allKeys := agollo.GetAllKeys()
-	for _, key := range allKeys {
-		if key == "yaml" {
-			continue
+	setConfig(ac.Namespaces)
+
+}
+
+//设置配置
+func setConfig(namespaces []string) {
+	var yamlContents string
+	//获取各个yaml命名空间的配置内容，写到文件里面
+	for _, namespace := range namespaces {
+		if strings.HasSuffix(namespace, ".yaml") {
+			content := agollo.GetContent(agollo.WithNamespace(namespace))
+			yamlContents += "\n\n" + content
 		}
-		setConfig(key, agollo.GetString(key))
+	}
+	writeYamlFile(yamlContents)
+	//获取properties命名空间的配置，写内存
+	for _, namespace := range namespaces {
+		if strings.HasSuffix(namespace, ".properties") {
+			//获取其他的配置写入内存
+			allKeys := agollo.GetAllKeys(agollo.WithNamespace(namespace))
+			for _, key := range allKeys {
+				if key == "yaml" {
+					continue
+				}
+				setKeyValue(key, agollo.GetString(key))
+			}
+		}
 	}
 }
 
 // 写入配置项
-func setConfig(key string, value string) {
-	//yaml 直接写入文件
-	if key == "yaml" {
-		writeFile(key, value)
-		return
-	}
+func setKeyValue(key string, value string) {
 	if value == "true" {
 		err := g.Cfg().Set(key, true)
 		if err != nil {
@@ -97,10 +109,7 @@ func setConfig(key string, value string) {
 }
 
 // 将apollo的配置写入文件
-func writeFile(key string, value string) {
-	if key != "yaml" {
-		return
-	}
+func writeYamlFile(contents string) {
 	dir := "etc"
 	err := gfile.Mkdir(dir)
 	if err != nil {
@@ -109,7 +118,7 @@ func writeFile(key string, value string) {
 	}
 	filename := "config-" + gstr.ToLower(genv.Get("ENV")) + ".yaml"
 	path := dir + "/" + filename
-	err = gfile.PutContents(path, value)
+	err = gfile.PutContents(path, contents)
 	if err != nil {
 		g.Log().Error(err)
 		panic(err)
